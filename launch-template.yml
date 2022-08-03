@@ -1,0 +1,110 @@
+Description: Create a demo launch template
+
+Parameters:
+  keyId:
+    Type: String
+  instanceType:
+    Type: String
+    Default: t3.small
+    AllowedValues:
+      - t3.small
+      - t3.medium
+      - t3.large
+  environment:
+    Type: String
+    Default: development
+    AllowedValues:
+      - development
+      - production
+  vpcId:
+    Type: String
+
+Mappings:
+  amiMap:
+    ca-central-1:
+      amiId: ami-041a9937e9118f3f3
+    us-east-1:
+      amiId: ami-090fa75af13c156b4
+
+Resources:
+  instanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Description: IAM role used for our Launch template demo session
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Tags:
+        - Key: environment
+          Value: !Ref environment
+
+  instanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    DependsOn:
+      - instanceRole
+    Properties:
+      Roles:
+        - !Ref instanceRole
+
+  demoSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for our launch template demo session
+      VpcId: !Ref vpcId
+      Tags:
+        - Key: environment
+          Value: !Ref environment
+
+  demoLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    DependsOn:
+      - instanceProfile
+      - demoSecurityGroup
+    Properties:
+      LaunchTemplateData:
+        BlockDeviceMappings:
+          - DeviceName: /dev/xvda
+            Ebs:
+              DeleteOnTermination: True
+              Encrypted: True
+              KmsKeyId: !Sub 'arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/${keyId}'
+              Throughput: 125
+              VolumeSize: 20
+              VolumeType: gp3
+        EbsOptimized: True
+        IamInstanceProfile:
+          Arn: !GetAtt instanceProfile.Arn
+        ImageId: !FindInMap [ amiMap, !Ref 'AWS::Region', amiId ]
+        InstanceType: !Ref instanceType
+        MetadataOptions:
+          HttpTokens: required
+        Monitoring:
+          Enabled: True
+        SecurityGroupIds:
+          - !GetAtt demoSecurityGroup.GroupId
+        TagSpecifications:
+          - ResourceType: instance
+            Tags:
+              - Key: Name
+                Value: !Sub '${AWS::StackName}-${environment}'
+              - Key: environment
+                Value: !Ref environment
+      TagSpecifications:
+        - ResourceType: launch-template
+          Tags:
+            - Key: environment
+              Value: !Ref environment
+
+Outputs:
+  launchTemplateId:
+    Value: !Ref demoLaunchTemplate
+    Export:
+      Name: !Sub '${AWS::StackName}-lt-id'
