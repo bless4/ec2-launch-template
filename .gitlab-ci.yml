@@ -21,7 +21,7 @@ deploy:
   script:
     - aws cloudformation deploy --template-file ./launch-template.yml --stack-name $stackName
       --no-execute-changeset --no-fail-on-empty-changeset
-      --tags owner=$owner
+      --tags owner=$owner environment=$environment
       --parameter-overrides keyId=$keyId vpcId=$vpcId
       --capabilities CAPABILITY_IAM
       --profile $profile
