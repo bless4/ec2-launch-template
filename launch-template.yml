@@ -53,12 +53,3 @@ Resources:
     Properties:
       Roles:
         - !Ref instanceRole
-
-  demoSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Security group for our launch template demo session
-      VpcId: !Ref vpcId
-      Tags:
-        - Key: environment
-          Value: !Ref environment
