@@ -1,0 +1,22 @@
+variables:
+  profile: co-demo
+  owner: CuriousOrbit
+  environment: development
+
+stages:
+  - validate
+  - deploy
+
+validate:
+  stage: validate
+  script:
+    - aws cloudformation validate-template --template-body file://launch-template.yml
+
+deploy:
+  stage: deploy
+  variables:
+    stackName: launchtemplate-demo
+  script:
+    - aws cloudformation deploy --template-file ./launch-template.yml --stack-name $stackName
+      --no-execute-changeset --no-fail-on-empty-changeset
+      --tags owner=$stackOwner ownerEmail=$stackOwnerEmail
