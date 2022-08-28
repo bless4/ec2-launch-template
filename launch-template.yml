@@ -111,7 +111,7 @@ Resources:
     DependsOn:
       - demoLaunchTemplate
     Properties:
-      LaunchTemplateSpecification:
+      LaunchTemplate:
         LaunchTemplateId: !Ref demoLaunchTemplate
         Version: !GetAtt demoLaunchTemplate.DefaultVersionNumber
       SubnetId: !Ref subnetId
