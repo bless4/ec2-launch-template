@@ -104,10 +104,6 @@ Resources:
             - Key: environment
               Value: !Ref environment
 
-  demoEC2Intance:
-    Type: AWS::EC2::Instance
-
-
 Outputs:
   launchTemplateId:
     Value: !Ref demoLaunchTemplate
