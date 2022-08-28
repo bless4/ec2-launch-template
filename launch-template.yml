@@ -75,6 +75,7 @@ Resources:
             Ebs:
               DeleteOnTermination: True
               Encrypted: True
+              Iops: 3000
               KmsKeyId: !Sub 'arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/${keyId}'
               Throughput: 125
               VolumeSize: 20
