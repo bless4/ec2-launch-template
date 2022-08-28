@@ -18,10 +18,11 @@ deploy:
     stackName: launchtemplate-demo
     keyId: a9a82103-025c-40da-835b-e05d8d716202
     vpcId: vpc-0c7af6b9318c3bb69
+    subnetId: subnet-00bd7fcd258c5e649
   script:
     - aws cloudformation deploy --template-file ./launch-template.yml --stack-name $stackName
       --no-execute-changeset --no-fail-on-empty-changeset
       --tags owner=$owner environment=$environment
-      --parameter-overrides keyId=$keyId vpcId=$vpcId
+      --parameter-overrides keyId=$keyId vpcId=$vpcId subnetId=$subnetId
       --capabilities CAPABILITY_IAM
       --profile $profile
